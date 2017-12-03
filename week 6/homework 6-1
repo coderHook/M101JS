@@ -1,0 +1,23 @@
+db.companies.aggregate( [
+    { $match: { "relationships.person": { "$ne": null } } },
+    { $project: {
+            relationships: 1,
+            _id: 0,
+            name: 1
+
+           } },
+    { $unwind: "$relationships" },
+    { $group: {
+        "_id": "$relationships.person",
+        "name": {"$addToSet": "$name"}
+    } },
+
+    {$match: {"$or": [
+        {"_id.permalink": "roger-ehrenberg"},
+        {"_id.permalink": "eric-di-benedetto"},
+    ]
+
+  }},
+    {$project: {"numberCompanies": {$size: "$name"}}}
+
+] );
